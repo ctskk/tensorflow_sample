@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=C0103, C0111, C0326, C0301, E1129, C0325, W0613, R0914
 
+#tensorboard --logdir=./data でport6006が開く
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -43,6 +45,7 @@ def main(argv=None):
     label_placeholder = tf.placeholder(tf.int32, shape=[1], name='label')
 
     #(height, width, depth) -> (batch, height, width, depth)
+    #処理inferenceにはplaceholderを与えて画像を32x32x3の次元に展開させたものを与える。
     image_node = tf.expand_dims(train_placeholder, 0)
 
     logits = model.inference(image_node)
@@ -54,16 +57,20 @@ def main(argv=None):
 
         total_duration = 0
 
+        #30世代回す
         for epoch in range(1, FLAGS.epoch + 1):
             start_time = time.time()
 
+            #data_batch_1-5.bin を処理する
             for file_index in range(5):
                 print('Epoch %d: %s' % (epoch, filenames[file_index]))
                 reader = Cifar10Reader(filenames[file_index])
 
+                #1ファイルあたり10000画像入っているので全部処理する
                 for index in range(10000):
                     image = reader.read(index)
 
+                    #sess.runにはplaceholderをキーにして、流し込むバッファを指定すると上手いこと型が合うように渡される
                     _, loss_value, logits_value = sess.run(
                         [train_op, total_loss, logits],
                         feed_dict={
@@ -77,9 +84,12 @@ def main(argv=None):
                         print('[%d]: %r' % (image.label, logits_value))
 
                 reader.close()
+
             duration = time.time() - start_time
             total_duration += duration
 
+            #1世代ごとに時間とLogを出力する
+            print('epoch %d duration = %d src' % (epoch, duration))
             tf.summary.FileWriter(FLAGS.checkpoint_dir, sess.graph)
 
         print('Total duration = %d src' % total_duration)
