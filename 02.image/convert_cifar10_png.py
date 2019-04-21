@@ -27,14 +27,14 @@ reader = Cifar10Reader(FLAGS.file)
 stop = FLAGS.offset + FLAGS.length
 
 for index in range(FLAGS.offset, stop):
-    image = reader.read(index)
+	image = reader.read(index)
 
-    print('label: %d' % image.label)
-    imageshow = Image.fromarray(image.byte_array.astype(np.uint8))
+	print('label: %d' % image.label)
+	imageshow = Image.fromarray(image.byte_array.astype(np.uint8))
 
-    file_name = '%s-%02d-%d.png' % (basename, index, image.label)
-    file = os.path.join(path, file_name)
-    with open(file, mode='wb') as out:
-        imageshow.save(out, format='png')
+	file_name = '%s-%02d-%d.png' % (basename, index, image.label)
+	file = os.path.join(path, file_name)
+	with open(file, mode='wb') as out:
+		imageshow.save(out, format='png')
 
 reader.close()
