@@ -1,0 +1,20 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "tensorboard",
+			"type": "shell",
+			"command": "tensorboard --logdir=./checkpoints",
+			"problemMatcher": []
+		},
+		{
+			"label": "tensorboard chrome",
+			"type": "shell",
+			"dependsOn": "tensorboard",
+			"command": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe http://localhost:6006",
+			"problemMatcher": []
+		}
+	]
+}
